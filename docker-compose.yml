@@ -1,0 +1,34 @@
+version: "3.7"
+services:
+  web-server:
+    build:
+      dockerfile: Dockerfile
+      context: php/
+    restart: unless-stopped
+    volumes:
+      - "./html/:/var/www/html/"
+    ports:
+      - 80:80
+
+  ftp:
+    build:
+      dockerfile: Dockerfile
+      context: ftp/
+    volumes:
+      - "./html/users/:/ftp/"
+      - "./ftp/users/:/ftp_users/"
+      - "./ftp/default_data/:/default_data/"
+    restart: unless-stopped
+    network_mode: "host"
+    env_file:
+      - environment.yml
+
+  mariadb:
+    image: linuxserver/mariadb:latest
+    restart: unless-stopped
+    env_file:
+      - environment.yml
+    ports:
+      - 3306:3306
+    volumes:
+      - ./mariadb/:/config
